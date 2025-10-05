@@ -140,11 +140,11 @@ class Window:
     def update(self):
         """Updates the screen to show all objects that are to be drawn"""
         self.screen.fill(self.backgroundColor)
-        # for obj in self.objects:
-        #     if obj.getVisibility():
-        #         obj.draw()
-        # pygame.display.flip()
-        self.clock.tick(60)
+        for obj in self.objects:
+            if obj.getVisibility():
+                obj.draw()
+        pygame.display.flip()
+        self.clock.tick()
         self.events = pygame.event.get()
         self._updateKeys()
         self._updateRunningTime()
@@ -271,10 +271,10 @@ class Circle(GraphicsObject):
     def draw(self):
         """Draws the Circle. First pass is the Circle itself if the user has not changed the outline width.
         The second is to draw a second circle at the same position with the outline changed and no fill color."""
-        # pygame.draw.circle(self.window.screen, self.color, (self.x, self.y), self.radius)
-        #
-        # if self.outlineWidth != 0:
-        #     pygame.draw.circle(self.window.screen, self.outlineColor, (self.x, self.y), self.radius, width=self.outlineWidth)
+        pygame.draw.circle(self.window.screen, self.color, (self.x, self.y), self.radius)
+
+        if self.outlineWidth != 0:
+            pygame.draw.circle(self.window.screen, self.outlineColor, (self.x, self.y), self.radius, width=self.outlineWidth)
 
         pygame.draw.circle(self.fillSurface, self.color, (0.5 * self.radius, 0.5 * self.radius), self.radius)
         self.window.screen.blit(self.fillSurface, (self.x - 0.5 * self.radius, self.y - 0.5 * self.radius))
@@ -466,7 +466,11 @@ class Image(GraphicsObject):
         self.y = y
         self.file = file
         self.transparent = transparent
-        self.image = self._createImage()
+        self.originalImage = self._createImage()
+        self.scaledImage = self.originalImage
+        self.image = self.originalImage
+        self.sizeX, self.sizeY = self.scaledImage.get_size()
+        self.rotation = 0.0
 
 
     def _createImage(self):
@@ -483,13 +487,18 @@ class Image(GraphicsObject):
     def resizeImage(self, width, height):
         """Resizes the image to the width and height passed to the function."""
         invalidValueCheck(width, height)
-        self.image = pygame.transform.scale(self.image, (width, height))
+        self.sizeX = width
+        self.sizeY = height
+        self.scaledImage = pygame.transform.scale(self.originalImage, (width, height))
+        self.image = pygame.transform.rotate(self.scaledImage, self.rotation)
 
     def scaleImage(self, scalar):
         """Scales the size of the image based on the scalar passes to the function."""
         invalidValueCheck(scalar)
-        width, height = self.image.get_size()
-        self.image = pygame.transform.scale(self.image, (width * scalar, height * scalar))
+        self.sizeX *= scalar
+        self.sizeY *= scalar
+        self.scaledImage = pygame.transform.scale(self.originalImage, (self.sizeX, self.sizeY))
+        self.image = pygame.transform.rotate(self.scaledImage, self.rotation)
 
     def getHeight(self):
         """Returns the height of the image."""
@@ -499,11 +508,19 @@ class Image(GraphicsObject):
         """Returns the width of the image."""
         return self.image.get_size()[0]
 
+    def rotateImageTo(self, degrees):
+        """Sets image rotation to degrees."""
+        if not isinstance(degrees, (int, float)):
+            raise GraphicsError(f"Expected int or float. Instead received {degrees}")
+        self.rotation = degrees
+        self.image = pygame.transform.rotate(self.scaledImage, self.rotation)
+
     def rotateImage(self, degrees):
         """Rotates the image by degrees."""
         if not isinstance(degrees, (int, float)):
             raise GraphicsError(f"Expected int or float. Instead received {degrees}")
-        self.image = pygame.transform.rotate(self.image, degrees)
+        self.rotation += degrees
+        self.image = pygame.transform.rotate(self.scaledImage, self.rotation)
 
     def flipVertically(self):
         """Flips the image vertically."""
