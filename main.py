@@ -1,27 +1,48 @@
-import math
+import menu
+import game_handler
 
-import graphics as g
-import time
+is_running = True
+is_in_game = False
 
-last60frametime = time.time()
-frameNum = 0
-
-win = g.Window(600, 400)
-
-img = g.Image(300, 200, win, "test.png", True)
-img.resizeImage(160, 160)
+def initialize():
+    pass
 
 
-while win.running:
-    scale = math.sin(time.time() * 1.5) * .5 + 1.5
-    img.resizeImage(160 * scale, 160 * scale)
-    img.rotateImageTo(math.sin(time.time() * 3) * 20)
+def update():
+    global is_in_game
 
-    img.draw()
-    win.update()
+    if is_in_game:
 
-    frameNum += 1
-    if frameNum % 60 == 0:
-        t = time.time()
-        print(60 / (t - last60frametime))
-        last60frametime = t
+        if game_handler.should_close():
+            game_handler.unload()
+            menu.load()
+            is_in_game = False
+        else:
+            game_handler.update()
+
+    else:
+
+        game = menu.game_to_play()
+        if game != "":
+            menu.unload()
+            game_handler.load(game)
+            is_in_game = True
+        else:
+            menu.update()
+
+
+def main():
+    initialize()
+    menu.load()
+
+    while is_running:
+        update()
+
+    if is_in_game:
+        game_handler.unload()
+    else:
+        menu.unload()
+
+
+if __name__ == '__main__':
+    main()
