@@ -1,6 +1,4 @@
 
-# print("imported")
-
 # uncomment to cause an error (divide by 0)
 # a = 1 / 0
 
@@ -26,3 +24,14 @@ def unload():
     # print("unloaded")
     # uncomment to cause an error (divide by 0)
     # a = 1 / 0
+
+class ImportTest:
+
+    def __init__(self):
+        print("imported")
+
+    def __del__(self):
+        print("unimported")
+
+
+test = ImportTest()
