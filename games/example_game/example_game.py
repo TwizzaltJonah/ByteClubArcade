@@ -4,10 +4,10 @@ image = None
 
 def load():
     global image
-    image = graphics.Image(123, 500, win, "games/test_game/icon.png")
+    image = graphics.Image(500, 800, win, "games/example_game/icon.png")
 
 def should_close() -> bool:
-    return hasKeybindBeenPressed("button2")
+    return hasKeybindBeenPressed("button3")
 
 
 def update():

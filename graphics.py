@@ -424,7 +424,7 @@ class Line(GraphicsObject):
         self.y2 += dy
 
 class Text(GraphicsObject):
-    def __init__(self, x, y, window, color=(0, 0, 0), mode="CORNER", fontSize=12):
+    def __init__(self, x, y, window, color=(0, 0, 0), mode="CORNER", fontSize=12, spacingFactor=0.8):
         super().__init__(window, color=color)
         self.x = x
         self.y = y
@@ -432,11 +432,12 @@ class Text(GraphicsObject):
         self.fontSize = fontSize
         self.mode = mode
         self.text = pygame.font.Font(None, self.fontSize)
-        self.str = ""
+        self.lines = ()
+        self.spacingFactor = spacingFactor
 
-    def setText(self, str):
+    def setText(self, string: str):
         """Sets the Text of a Text object"""
-        self.str = str
+        self.lines = tuple(string.split("\n"))
 
     def setSize(self, size):
         """Sets the Font size of the Text Object"""
@@ -452,11 +453,12 @@ class Text(GraphicsObject):
 
     def draw(self):
         """Draws the Text object"""
-        textSurface = self.text.render(self.str, True, self.color)
-        if self.mode == "CORNER":
-            self.window.screen.blit(textSurface, (self.x, self.y))
-        else:
-            self.window.screen.blit(textSurface, textSurface.get_rect(center=(self.x, self.y)))
+        for i in range(len(self.lines)):
+            textSurface = self.text.render(self.lines[i], True, self.color)
+            if self.mode == "CORNER":
+                self.window.screen.blit(textSurface, (self.x, self.y + i * self.fontSize * self.spacingFactor))
+            else:
+                self.window.screen.blit(textSurface, textSurface.get_rect(center=(self.x, self.y + (i - len(self.lines) / 2 + .5) * self.fontSize * self.spacingFactor)))
 
 
 class Image(GraphicsObject):
@@ -535,7 +537,9 @@ class Image(GraphicsObject):
         self.x += dx
         self.y += dy
 
-
+    def moveTo(self, x, y):
+        self.x = x
+        self.y = y
 
 def testFunction():
     win = Window(600, 400)

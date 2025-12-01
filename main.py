@@ -1,15 +1,29 @@
 import menu
 import game_handler
+import graphics as g
+import inputs
 
 is_running = True
 is_in_game = False
 
+win: g.Window = None
+
 def initialize():
-    pass
+    global win
+    win = g.Window(1920, 1080)
+    win.setBackground((0, 0, 0))
+    menu.win = win
+    inputs.win = win
+    game_handler.win = win
+    menu.initialize()
 
 
 def update():
     global is_in_game
+
+    win.update()
+
+    inputs.update()
 
     if is_in_game:
 
@@ -33,7 +47,6 @@ def update():
 
 def main():
     initialize()
-    menu.load()
 
     while is_running:
         update()
