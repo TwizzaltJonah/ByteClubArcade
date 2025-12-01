@@ -7,3 +7,4 @@ from inputs import (hasJoystickChangedDirections,
                     isKeybindDown)
 
 win: graphics.Window = None
+frame_time = 0.005

@@ -4,6 +4,7 @@ import os
 import game_handler
 import traceback
 import inputs
+import import_this
 
 
 win: g.Window = None
@@ -19,7 +20,7 @@ num_game_previews = 0
 scroll_offset = 0.0
 selected_game = 0
 preview_spacing = 360
-scroll_speed = 0.01
+scroll_speed = 3.0
 
 
 class GamePreview:
@@ -113,10 +114,10 @@ def update():
         game_name_text.setText(game_previews[selected_game].game.name)
         game_description_text.setText(game_previews[selected_game].game.description)
 
-    if scroll_offset > scroll_speed:
-        scroll_offset -= scroll_speed
-    elif scroll_offset < -scroll_speed:
-        scroll_offset += scroll_speed
+    if scroll_offset > scroll_speed * import_this.frame_time:
+        scroll_offset -= scroll_speed * import_this.frame_time
+    elif scroll_offset < -scroll_speed * import_this.frame_time:
+        scroll_offset += scroll_speed * import_this.frame_time
 
 def unload():
     main_menu_image.setVisibility(False)
