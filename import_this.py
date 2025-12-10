@@ -8,3 +8,4 @@ from inputs import (hasJoystickChangedDirections,
 
 win: graphics.Window = None
 frame_time = 0.005
+frame_num = 0

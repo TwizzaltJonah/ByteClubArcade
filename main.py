@@ -54,6 +54,8 @@ def update():
     prev_frame_time = now
     # print(import_this.frame_time)
 
+    import_this.frame_num = (import_this.frame_num + 1) % 2147483647
+
 def main():
     initialize()
 

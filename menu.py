@@ -16,6 +16,10 @@ main_menu_image: g.Image = None
 game_name_text: g.Text = None
 game_description_text: g.Text = None
 
+frame_memory = 20
+fps_text: g.Text = None
+fps_list = [0.005 for i in range(frame_memory)]
+
 num_game_previews = 0
 scroll_offset = 0.0
 selected_game = 0
@@ -64,10 +68,13 @@ def get_valid_games():
     return games
 
 def initialize():
-    global main_menu_image, games, game_previews, num_game_previews, game_name_text, game_description_text
+    global main_menu_image, games, game_previews, num_game_previews, game_name_text, game_description_text, fps_text
 
     main_menu_image = g.Image(1920 // 2, 1080 // 2, win, "resources/main_menu.png")
     main_menu_image.resizeImage(1920, 1080)
+
+    if game_handler.debug_mode:
+        fps_text = g.Text(0, 0, win, fontSize=64, color=(255, 255, 255))
 
     game_name_text = g.Text(350, 790, win, fontSize=128, color=(20, 52, 100))
     game_description_text = g.Text(350, 880, win, fontSize=64, color=(20, 52, 100))
@@ -99,6 +106,11 @@ def game_to_play() -> str:
 
 def update():
     global scroll_offset, selected_game, game_name_text, game_description_text
+
+    if game_handler.debug_mode:
+        fps_text.setText(str(int(frame_memory / sum(fps_list) * 100) / 100))
+        fps_list[import_this.frame_num % frame_memory] = import_this.frame_time
+
     for i in range(num_game_previews):
         x = 960 + ((i + scroll_offset + selected_game + 3.0) % num_game_previews - 3.0) * preview_spacing
         game_previews[i].img.moveTo(x, 380)
